@@ -107,7 +107,11 @@ string translate(Literal literal, ExpressionContext context)
         return "octal!" ~ core ~ suffix;
     }
 
-    return literal.spelling;
+    // Truncate [U]LL to [U]L
+    auto res = literal.spelling;
+    if (res.length > 2 && toUpper(res[$-2]) == 'L' && toUpper(res[$-1]) == 'L')
+        res = res[0..$-1];
+    return res;
 }
 
 string translate(Identifier identifier, ExpressionContext context)

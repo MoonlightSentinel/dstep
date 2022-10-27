@@ -12,6 +12,9 @@ at some point in the future:
 
 - support for incomplete compilations, e.g. due to missing headers
 
+Bugfixes:
+- `[U]LL` literals are translated as `[U]L`
+
 ## Download
 
 For the latest release see: [releases/latest](https://github.com/jacob-carlborg/dstep/releases/latest).
