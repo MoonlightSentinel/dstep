@@ -103,7 +103,7 @@ class Application
 
                 with (CXDiagnosticSeverity)
                     if (translate)
-                        translate = !(severity == error || severity == fatal);
+                        translate = !(severity == fatal);
 
                 message.put(diagnostics.format);
                 message.put("\n");

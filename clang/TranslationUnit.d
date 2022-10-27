@@ -47,7 +47,7 @@ struct TranslationUnit
                 cast(int) arguments.length,
                 toCArray!(CXUnsavedFile)(unsavedFiles),
                 cast(uint) unsavedFiles.length,
-                options));
+                options | CXTranslationUnit_Flags.incomplete));
     }
 
     static TranslationUnit parseString (
@@ -70,7 +70,7 @@ struct TranslationUnit
             name,
             commandLineArgs,
             unsavedFiles,
-            options);
+            options | CXTranslationUnit_Flags.incomplete);
 
         remove(name);
 
@@ -104,7 +104,7 @@ struct TranslationUnit
         import std.algorithm;
 
         alias predicate =
-            x => x.severity != CXDiagnosticSeverity.error &&
+            x => // x.severity != CXDiagnosticSeverity.error &&
                 x.severity != CXDiagnosticSeverity.fatal;
 
         return diagnosticSet.all!predicate();

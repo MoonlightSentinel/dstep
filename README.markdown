@@ -5,6 +5,13 @@ libraries. This is implemented by processing C or Objective-C header files and
 output D modules. DStep uses the Clang compiler as a library (libclang) to
 process the header files.
 
+## Fork-specific changes
+
+The following changes are currently implemented in this fork an might be upstreamed
+at some point in the future:
+
+- support for incomplete compilations, e.g. due to missing headers
+
 ## Download
 
 For the latest release see: [releases/latest](https://github.com/jacob-carlborg/dstep/releases/latest).
