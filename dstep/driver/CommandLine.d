@@ -72,6 +72,16 @@ auto parseCommandLine(string[] args)
         "language|x", &parseLanguage,
         makeGetOptArgs!config);
 
+    // Ensure absolute paths for root directories
+    string[string] absPackageByRoot;
+    foreach (dir, mod; config.packageByRootDirectory)
+    {
+        import clang.Util : asAbsNormPath;
+        const abs = asAbsNormPath(dir);
+        absPackageByRoot[abs] = mod;
+    }
+    config.packageByRootDirectory = absPackageByRoot;
+
     // remove dstep binary name (args[0])
     args = args[1 .. $];
 

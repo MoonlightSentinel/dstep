@@ -31,6 +31,8 @@ struct Options
     string inputFile;
     string outputFile;
     Language language = Language.c;
+    /// array of project root directories that should be used for module association
+    string[string] packageByRootDirectory;
     string packageName;
     bool enableComments = true;
     bool publicSubmodules = false;
@@ -67,7 +69,12 @@ struct Options
     }
 }
 
-string fullModuleName(string packageName, string path, bool normalize = true)
+string fullModuleName(
+    const string packageName,
+    const string[string] packageByRootDirectory,
+    const string path,
+    const bool normalize = true
+)
 {
     import std.algorithm;
     import std.path : baseName, stripExtension;
@@ -95,19 +102,28 @@ string fullModuleName(string packageName, string path, bool normalize = true)
         return (a == '.' || a == '_') && (b == '.' || b == '_');
     }
 
-    auto moduleBaseName = stripExtension(baseName(path));
-    auto moduleName = moduleBaseName.map!replace.filter!discard.uniq!equivalent;
+    const rp = resolvePackageRootPath(path, packageByRootDirectory);
+    auto relPath = rp.found
+                ? rp.relativePath
+                : baseName(path);
 
+    auto moduleBaseName = stripExtension(relPath);
+    auto moduleName = moduleBaseName.map!replace.filter!discard.uniq!equivalent;
 
     if (normalize)
     {
         auto segments = moduleName.split!(x => x == '.');
         auto normalized = segments.map!(x => x.toUTF8.toSnakeCase).join('.');
-        return only(packageName, normalized).join('.');
+
+        return packageName.length == 0
+            ? normalized
+            : only(packageName, normalized).join('.');
     }
     else
     {
-        return only(packageName, moduleName.toUTF8).join('.');
+        return packageName.length == 0
+            ? moduleName.toUTF8
+            : only(packageName, moduleName.toUTF8).join('.');
     }
 }
 
@@ -133,4 +149,49 @@ unittest
 
     assert(fullModuleName("pkg", "FooBarBaz.ext", false) == "pkg.FooBarBaz");
     assert(fullModuleName("pkg", "FooBar.BazQux.ext", false) == "pkg.FooBar.BazQux");
+}
+
+/// Informations about a file in a package root
+struct ResolvedPath
+{
+    bool found;             /// true when the package was resolved
+    string relativePath;    /// file path relative to the package root
+    string packageName;     /// name of the package
+}
+
+/++
+ + Checks whether `path` denotes a file inside of the known packages
+ + (specified via `--subpackage` on the command line, stored in `packageByRootDirectory`)
+ +/
+ResolvedPath resolvePackageRootPath(string path, const string[string] packageByRootDirectory)
+{
+    import std.path : buildPath, dirName, relativePath;
+    import clang.Util : asAbsNormPath;
+
+    // Shortcut if the user didn't specify any package
+    if (!packageByRootDirectory.length)
+        return ResolvedPath.init;
+
+    // Ensure absolute paths
+    path = asAbsNormPath(path);
+
+    // Iterate all parent directories until there's a match in
+    // packageByRootDirectory or it reached the file system root
+    string root = path;
+    string next;
+
+    while ((next = dirName(root)) != root)
+    {
+        root = next;
+
+        if (auto ptr = root in packageByRootDirectory)
+        {
+            const pac = *ptr;
+            const rel = relativePath(path, root);
+            const subRel = buildPath(pac, rel);   // Prepend custom package name
+            return ResolvedPath(true, subRel, pac);
+        }
+    }
+
+    return ResolvedPath.init;
 }

@@ -10,6 +10,52 @@ process the header files.
 The following changes are currently implemented in this fork an might be upstreamed
 at some point in the future:
 
+- implement the `--subpackage <directory=package>` switch to support
+  headers with library dependencies. The flag registers the specified
+  directory as a source path (similar to `-I` from clang) that contains
+  source files belonging to the specified package.
+
+  This flags enables DStep to handle complex libraries consisting of
+  multiple subpackages by mirroring the directory structure in the
+  `--output` directory and using appropriate module names / imports.
+
+  Consider the following example:
+
+```
+├── app
+│   └── source
+│       └── root.h
+├── lib
+│   └── source
+│       ├── common.h
+│       └── nested
+│           └── stuff.h
+```
+
+Example command that yields the following results:
+
+```
+dstep \
+    -Iapp/source \
+    -Ilib/source \
+    --output=output \
+    --subpackage app/source=app \
+    --subpackage=lib/source=lib \
+    app/source/root.h \
+    lib/source/common.h \
+	lib/source/nested/stuff.h
+```
+
+```
+output
+├── app
+│   └── root.d
+└── lib
+    ├── common.d
+    └── nested
+        └── stuff.d
+```
+
 - support for incomplete compilations, e.g. due to missing headers
 - expose the `keep-untranslatable` flag to the CLI
 

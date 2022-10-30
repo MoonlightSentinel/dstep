@@ -113,7 +113,7 @@ class IncludeHandler
         this.headerIndex = headerIndex;
         this.options = options;
 
-        if (options.packageName != "")
+        if (options.packageName != "" || options.packageByRootDirectory.length)
         {
             auto inputFiles = options.inputFiles.filter!(
                 x => x != options.inputFile);
@@ -122,7 +122,7 @@ class IncludeHandler
             {
                 auto packageName = options.packageName;
                 auto normalize = options.normalizeModules;
-                submodules[file] = fullModuleName(packageName, file, normalize);
+                submodules[file] = fullModuleName(packageName, options.packageByRootDirectory, file, normalize);
             }
         }
     }

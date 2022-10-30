@@ -144,9 +144,14 @@ class Application
         }
         else
         {
-            alias fmap = file => Path.buildPath(
-                config.output,
-                makeDefaultOutputFile(file, false));
+            string fmap(string file)
+            {
+                const rb = resolvePackageRootPath(file, config.packageByRootDirectory);
+
+                return Path.buildPath(
+                    config.output,
+                    makeDefaultOutputFile(rb.found ? rb.relativePath : file, false));
+            }
 
             return inputFiles.map!fmap.array;
         }

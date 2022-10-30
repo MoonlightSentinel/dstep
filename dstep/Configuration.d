@@ -41,6 +41,10 @@ struct Configuration
     @("package", "Use <package> as package name.")
     string packageName;
 
+    /// array of project root directories that should be used for module association
+    @("subpackage", "Consider files in a directory as members of a submodule <directory=submodule>.")
+    string[string] packageByRootDirectory;
+
     /// enable translation of comments
     @("comments", "Translate comments [default].")
     bool enableComments = true;
@@ -130,6 +134,7 @@ struct Configuration
 
         Options options;
         options.inputFiles = inputFiles.map!(path => path.asAbsNormPath).array;
+        options.packageByRootDirectory = cast(string[string]) packageByRootDirectory;
         options.language = language;
         options.enableComments = enableComments;
         options.packageName = packageName;

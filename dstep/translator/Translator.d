@@ -197,6 +197,10 @@ class Translator
                     output.flushLocation(cursor.extent);
                     break;
 
+                case inclusionDirective:
+                    context.includeHandler.addInclude(cursor.includedPath);
+                    break;
+
                 default:
                     break;
             }
@@ -342,12 +346,14 @@ private:
 
     void moduleDeclaration (Output output)
     {
-        if (context.options.packageName != "")
+        if (context.options.packageName != "" || context.options.packageByRootDirectory.length)
         {
             output.singleLine("module %s;", fullModuleName(
                 context.options.packageName,
-                context.options.outputFile,
-                context.options.normalizeModules));
+                context.options.packageByRootDirectory,
+                context.options.inputFile,
+                context.options.normalizeModules
+        ));
 
             output.separator();
         }
