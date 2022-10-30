@@ -53,6 +53,10 @@ struct Configuration
     @("normalize-modules", "Rename modules to D conforming form [default].")
     bool normalizeModules = false;
 
+    /// Add comment for untranslatable definitions
+    @("keep-untranslatable", "Keep untranslatable definitions as comments [default].")
+    bool keepUntranslatable = false;
+
     /// enable reduction of primitive type aliases
     @("reduce-aliases", "Reduce primitive type aliases [default].")
     bool reduceAliases = true;
@@ -131,6 +135,7 @@ struct Configuration
         options.packageName = packageName;
         options.publicSubmodules = publicSubmodules;
         options.normalizeModules = normalizeModules;
+        options.keepUntranslatable = keepUntranslatable;
         options.reduceAliases = reduceAliases;
         options.translateMacros = translateMacros;
         options.aliasEnumMembers = aliasEnumMembers;

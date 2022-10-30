@@ -11,6 +11,7 @@ The following changes are currently implemented in this fork an might be upstrea
 at some point in the future:
 
 - support for incomplete compilations, e.g. due to missing headers
+- expose the `keep-untranslatable` flag to the CLI
 
 Bugfixes:
 - `[U]LL` literals are translated as `[U]L`
