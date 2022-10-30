@@ -15,6 +15,10 @@ at some point in the future:
 Bugfixes:
 - `[U]LL` literals are translated as `[U]L`
 
+Internal:
+- disable parallelism by default for non-optimized builds. Compile with
+  `-version=ENABLE_PARALLELISM` to revert to the old behaviour
+
 ## Download
 
 For the latest release see: [releases/latest](https://github.com/jacob-carlborg/dstep/releases/latest).

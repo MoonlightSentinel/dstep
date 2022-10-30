@@ -10,7 +10,6 @@ import std.getopt;
 import std.stdio : writeln, stderr;
 import Path = std.path;
 import std.file;
-import std.parallelism;
 
 import clang.c.Index;
 
@@ -20,10 +19,21 @@ import clang.TranslationUnit;
 import clang.Util;
 
 import dstep.Configuration;
-import dstep.translator.Options;
 import dstep.core.Exceptions;
 import dstep.translator.Options;
 import dstep.translator.Translator;
+
+version (D_Optimized)
+    version = ENABLE_PARALLELISM;
+
+version (ENABLE_PARALLELISM)
+{
+    import std.parallelism;
+}
+else
+{
+    alias parallel = (a, _) => a;
+}
 
 class Application
 {
@@ -67,7 +77,8 @@ class Application
             translator.translate;
         }
 
-        taskPool.finish(true);
+        version (ENABLE_PARALLELISM)
+            taskPool.finish(true);
     }
 
     static void enforceInputFilesExist(const Configuration config)
@@ -143,7 +154,6 @@ class Application
 
     static TranslationUnit[] makeTranslationUnits(Configuration config)
     {
-        import std.parallelism;
 
         Index translationIndex = Index(false, false);
         Compiler compiler;
