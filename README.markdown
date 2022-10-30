@@ -14,6 +14,7 @@ at some point in the future:
 
 Bugfixes:
 - `[U]LL` literals are translated as `[U]L`
+- `--output=<directory>` works with single input files
 
 Internal:
 - disable parallelism by default for non-optimized builds. Compile with

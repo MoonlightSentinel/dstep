@@ -136,7 +136,7 @@ class Application
 
         // when only one input file is supplied, -o argument is
         // interpreted as file path, otherwise as base directory path
-        if (inputFiles.length == 1)
+        if (inputFiles.length == 1 && (!exists(config.output) && isDir(config.output)))
         {
             return [config.output.empty
                 ? makeDefaultOutputFile(inputFiles.front, false)
